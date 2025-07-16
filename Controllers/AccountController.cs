@@ -6,6 +6,7 @@ using HMCSnacks.Models;
 using static System.Net.WebRequestMethods;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using HMCSnacks.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace HMCSnacks.Controllers
@@ -25,6 +26,7 @@ namespace HMCSnacks.Controllers
 
         /// GET: /Account/Register
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             ViewBag.States = _context.States
@@ -37,6 +39,7 @@ namespace HMCSnacks.Controllers
 
         // POST: /Account/Register
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -96,12 +99,14 @@ namespace HMCSnacks.Controllers
 
         // GET: /Account/Login
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -167,12 +172,14 @@ namespace HMCSnacks.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Verify2FAOTP()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Verify2FAOTP(Verify2FAOTP model)
         {
@@ -219,6 +226,7 @@ namespace HMCSnacks.Controllers
 
         // GET: /Account/Logout
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Logout()
         {
             // ✅ Clear all session values
@@ -229,9 +237,11 @@ namespace HMCSnacks.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult ForgotPassword() => View();
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword(ForgotPassword model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -270,9 +280,11 @@ namespace HMCSnacks.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult VerifyOtp() => View();
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult VerifyOtp(VerifyOtp model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -292,6 +304,7 @@ namespace HMCSnacks.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult ResetPassword()
         {
             if (HttpContext.Session.GetString("OtpVerified") != "true")
@@ -301,6 +314,7 @@ namespace HMCSnacks.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> ResetPassword(ResetPassword model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -330,6 +344,7 @@ namespace HMCSnacks.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public JsonResult GetCities(int stateId)
         {
             var cities = _context.Cities
@@ -341,6 +356,7 @@ namespace HMCSnacks.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult UpdateProfile()
         {
             var username = HttpContext.Session.GetString("Username");
@@ -373,6 +389,7 @@ namespace HMCSnacks.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public IActionResult UpdateProfile(UpdateProfileViewModel model)
         {
             // Force model binder to ignore removed/empty addresses
