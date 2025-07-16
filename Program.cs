@@ -59,7 +59,13 @@ namespace HMCSnacks
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Account}/{action=Login}/{id?}");
-
+            
+            // Auto-migrate DB PostGre
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                db.Database.Migrate();
+            }
             app.Run();
         }
     }
