@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using HMCSnacks.Data;
-
-using HMCSnacks.Models;   // <-- Add this if EmailSettings class is in Models
+using HMCSnacks.Models; // For EmailSettings
 using Microsoft.Extensions.Options;
 
 namespace HMCSnacks
@@ -12,15 +11,18 @@ namespace HMCSnacks
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // ✅ Bind to Render's assigned port
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+            builder.WebHost.UseUrls($"http://*:{port}");
+
+            // ✅ Add services
             builder.Services.AddControllersWithViews();
 
-            // ✅ Add PostgreSQL DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // ✅ Add Session services
             builder.Services.AddDistributedMemoryCache();
+
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(10);
@@ -28,19 +30,16 @@ namespace HMCSnacks
                 options.Cookie.IsEssential = true;
             });
 
-            // ✅ Add HttpContextAccessor
             builder.Services.AddHttpContextAccessor();
 
-            // ✅ Add Email Configuration
             builder.Services.Configure<EmailSettings>(
                 builder.Configuration.GetSection("EmailSettings"));
 
-            // ✅ Register EmailService
             builder.Services.AddTransient<EmailService>();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // ✅ Middleware pipeline
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -51,23 +50,19 @@ namespace HMCSnacks
             app.UseStaticFiles();
 
             app.UseRouting();
-
             app.UseSession();
-
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Account}/{action=Login}/{id?}");
-            
-            // Auto-migrate DB PostGre
+
+            // ✅ Optional DB migration step (keep if needed)
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                // db.Database.Migrate(); // uncomment if you want auto-migration
             }
-
-            var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-            app.Urls.Add($"http://*:{port}");
 
             app.Run();
         }
