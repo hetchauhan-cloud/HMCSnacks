@@ -1,0 +1,90 @@
+﻿/* Register.css - Register page styles */
+
+body {
+    background: url('/images/snacks-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.auth-container {
+    background-color: rgba(255, 255, 255, 0.96);
+    border-radius: 15px;
+    padding: 2.5rem;
+    max-width: 700px;
+    width: 100%;
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.25);
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.brand-logo {
+    height: 120px;
+    margin: 0 auto 10px;
+    display: block;
+}
+
+.brand-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #d35400;
+    font-family: 'Poppins', sans-serif;
+}
+.tagline {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 1rem;
+    font-family: 'Georgia', sans-serif; 
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #d35400;
+    border: none;
+}
+
+    .btn-primary:hover {
+        background-color: #b84300;
+    }
+
+a {
+    color: #d35400;
+}
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+.alert {
+    font-size: 14px;
+    padding: 0.5rem 1rem;
+}
+
+@media (max-width: 576px) {
+    .row > .col-md-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+.address-section {
+    margin-top: 20px;
+}
+
+.address-block {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+
+    .address-block .btn-close {
+        background: transparent;
+        border: none;
+        float: right;
+    }

@@ -1,0 +1,157 @@
+﻿@model List<HMCSnacks.Models.ViewModels.ProductDisplayViewModel>
+@{
+    ViewData["Title"] = "Product List";
+    var cartItems = ViewBag.Cart as List<HMCSnacks.Models.CartItem> ?? new List<HMCSnacks.Models.CartItem>();
+}
+
+<h2 class="mt-4">Available Products</h2>
+<hr />
+
+@if (TempData["CartMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["CartMessage"]</div>
+}
+
+@if (ViewBag.CartCount != null && (int)ViewBag.CartCount > 0)
+{
+    <p><strong>Items in cart:</strong> @ViewBag.CartCount</p>
+}
+
+<div id="qtyAlert" class="alert alert-danger d-none" role="alert">
+    Please enter quantity before adding to cart.
+</div>
+
+<div id="overStockAlert" class="alert alert-danger d-none" role="alert"></div>
+
+<div class="row">
+    @foreach (var vm in Model)
+    {
+        var product = vm.Product;
+        var existing = cartItems.FirstOrDefault(x => x.ProductId == product.Id);
+        var defaultQty = existing?.Quantity ?? 0;
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 product-card position-relative">
+                @if (product.IsBestSeller)
+                {
+                    <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">⭐ Best Seller</span>
+                }
+
+                <div data-bs-toggle="modal" data-bs-target="#productModal-@product.Id" style="cursor: pointer;">
+                    <img src="@product.ImagePath" class="card-img-top" alt="@product.ProductName" style="height: 200px; object-fit: contain;" />
+                    <div class="card-body">
+                        <h5 class="card-title">@product.ProductName</h5>
+                        <p class="card-text"><strong>₹ @product.Price</strong></p>
+                        <p class="card-text text-muted">Weight/Size: @product.WeightOrSize</p>
+
+                        @if (product.StockQuantity == 0)
+                        {
+                            <span class="badge bg-danger">Out of Stock</span>
+                        }
+                        else if (product.StockQuantity <= 20)
+                        {
+                            <span class="badge bg-warning text-dark">Few left: @product.StockQuantity</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">In Stock: @product.StockQuantity</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-body border-top pt-2">
+                    <form asp-action="AddToCart" method="post" class="d-flex align-items-center add-to-cart-form">
+                        <input type="hidden" name="productId" value="@product.Id" />
+                        <input type="hidden" class="available-stock" value="@product.StockQuantity" />
+                        <div class="input-group me-2" style="width: 120px;">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="stepDownQty(this)">-</button>
+                            <input type="number" name="quantity" value="@defaultQty" min="0" max="@product.StockQuantity"
+                                   class="form-control text-center quantity-input" required />
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="stepUpQty(this)">+</button>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Modal -->
+        <div class="modal fade" id="productModal-@product.Id" tabindex="-1" aria-labelledby="productModalLabel-@product.Id" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="productModalLabel-@product.Id">@product.ProductName</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex">
+                        <div style="flex: 1; text-align: center;">
+                            <img src="@product.ImagePath" class="img-fluid" style="max-height: 250px;" />
+                        </div>
+                        <div style="flex: 2; padding-left: 20px;">
+                            <p><strong>Price:</strong> ₹@product.Price</p>
+                            <p><strong>Category:</strong> @product.Category</p>
+                            <p><strong>Stock:</strong> @product.StockQuantity</p>
+                            <p><strong>Weight/Size:</strong> @product.WeightOrSize</p>
+                            <p><strong>Pack Type:</strong> @product.PackType</p>
+                            <p><strong>Description:</strong> @product.Description</p>
+                            @if (product.IsBestSeller)
+                            {
+                                <span class="badge bg-warning text-dark">Best Seller</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<a href="/Product/ViewCart" class="btn btn-outline-success mt-3">View Cart</a>
+
+@section Scripts {
+    <script>
+        function stepUpQty(btn) {
+            const input = btn.parentNode.querySelector('input[type=number]');
+            if (parseInt(input.value) < parseInt(input.max)) input.stepUp();
+        }
+
+        function stepDownQty(btn) {
+            const input = btn.parentNode.querySelector('input[type=number]');
+            if (parseInt(input.value) > parseInt(input.min)) input.stepDown();
+        }
+
+        document.querySelectorAll('.add-to-cart-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                const qtyInput = form.querySelector('.quantity-input');
+                const stockInput = form.querySelector('.available-stock');
+                const qty = parseInt(qtyInput.value, 10);
+                const availableStock = parseInt(stockInput.value, 10);
+
+                const qtyAlert = document.getElementById('qtyAlert');
+                const overStockAlert = document.getElementById('overStockAlert');
+
+                if (qty <= 0 || isNaN(qty)) {
+                    e.preventDefault();
+                    qtyAlert.classList.remove('d-none');
+                    overStockAlert.classList.add('d-none');
+                    qtyAlert.scrollIntoView({ behavior: 'smooth' });
+                } else if (qty > availableStock) {
+                    e.preventDefault();
+                    qtyAlert.classList.add('d-none');
+                    overStockAlert.textContent = `⚠️ Only ${availableStock} in stock. Please reduce quantity.`;
+                    overStockAlert.classList.remove('d-none');
+                    overStockAlert.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    qtyAlert.classList.add('d-none');
+                    overStockAlert.classList.add('d-none');
+                }
+            });
+        });
+
+        // Auto-hide alerts after 4s
+        setTimeout(() => {
+            document.getElementById('qtyAlert')?.classList.add('d-none');
+            document.getElementById('overStockAlert')?.classList.add('d-none');
+        }, 4000);
+    </script>
+}

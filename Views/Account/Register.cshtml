@@ -1,0 +1,190 @@
+﻿@model HMCSnacks.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Register - HMC Snacks</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/Register.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="auth-container">
+        <div class="text-center mb-3">
+            <img src="~/images/HMCSnacks.png" alt="HMC Snacks Logo" class="brand-logo mb-2" />
+            <div class="brand-title">HMC Snacks</div>
+            <div class="tagline">Taste the Goodness</div>
+        </div>
+
+        <form asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+            <!-- Basic Info -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Name" class="form-label">Full Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Username" class="form-label">Username</label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MobileNumber" class="form-label">Mobile Number</label>
+                    <input asp-for="MobileNumber" class="form-control" />
+                    <span asp-validation-for="MobileNumber" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Password" class="form-label">Password</label>
+                    <input asp-for="Password" class="form-control" type="password" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                    <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Address Section -->
+            <div class="address-section mb-4">
+                <label class="form-label">Addresses</label>
+                <div id="addressContainer">
+                    <!-- Address 1 is mandatory and not removable -->
+                    <div class="input-group mb-2 address-block">
+                        <input type="text" name="Address1" class="form-control" placeholder="Address 1" required />
+                    </div>
+                </div>
+                <button type="button" id="addAddressBtn" class="btn btn-outline-secondary" onclick="addAddress()">+ Add Address</button>
+            </div>
+
+            <!-- Location -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="StateId" class="form-label">State</label>
+                    <select asp-for="StateId" id="StateId" class="form-control" asp-items="@(new SelectList(ViewBag.States, "Id", "StateName"))">
+                        <option value="">-- Select State --</option>
+                    </select>
+                    <span asp-validation-for="StateId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CityId" class="form-label">City</label>
+                    <select asp-for="CityId" id="CityId" class="form-control">
+                        <option value="">-- Select City --</option>
+                    </select>
+                    <span asp-validation-for="CityId" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label asp-for="Pincode" class="form-label">Pincode</label>
+                    <input asp-for="Pincode" class="form-control" />
+                    <span asp-validation-for="Pincode" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </div>
+            </div>
+
+            <div class="text-center">
+                Already have an account? <a href="@Url.Action("Login", "Account")">Login</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        let addressCount = 1;
+
+        function addAddress() {
+            if (addressCount >= 4) return;
+
+            addressCount++;
+            const fieldName = "Address" + addressCount;
+            const html = `
+                <div class="input-group mb-2 address-block">
+                    <input type="text" name="${fieldName}" class="form-control" placeholder="Address ${addressCount}" />
+                    <button type="button" class="btn btn-outline-danger" onclick="removeAddress(this)">&#10005;</button>
+                </div>
+            `;
+            $('#addressContainer').append(html);
+
+            if (addressCount === 4) {
+                $('#addAddressBtn').prop('disabled', true);
+            }
+        }
+
+        function removeAddress(button) {
+            $(button).closest('.address-block').remove();
+            addressCount--;
+
+            // Re-enable add button
+            if (addressCount < 4) {
+                $('#addAddressBtn').prop('disabled', false);
+            }
+
+            // Renumber field names and placeholders
+            $('#addressContainer .address-block').each(function (i, el) {
+                const input = $(el).find('input');
+                const newIndex = i + 1;
+                input.attr('name', 'Address' + newIndex);
+                input.attr('placeholder', 'Address ' + newIndex);
+            });
+        }
+
+            // State-City dynamic population
+        $(document).ready(function () {
+            $('#StateId').change(function () {
+                var stateId = $(this).val();
+                $('#CityId').empty().append('<option value="">-- Select City --</option>');
+
+                if (stateId) {
+                    $.getJSON('/Account/GetCities?stateId=' + stateId, function (data) {
+                        $.each(data, function (i, city) {
+                            $('#CityId').append($('<option>', {
+                                value: city.id,
+                                text: city.cityName
+                            }));
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .address-section {
+            margin-top: 25px;
+        }
+
+        .address-block input {
+            flex: 1;
+        }
+
+        .address-block .btn {
+            margin-left: 5px;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,155 @@
+﻿@model HMCSnacks.Models.ViewModels.UpdateProfileViewModel
+@{
+
+    ViewData["Title"] = "Update Profile";
+    var filledCount = ViewBag.FilledCount ?? 1;
+}
+
+<h2 class="mb-4">Update Profile</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="UpdateProfile" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Full Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Email Address</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="MobileNumber" class="form-label">Mobile Number</label>
+        <input asp-for="MobileNumber" class="form-control" />
+        <span asp-validation-for="MobileNumber" class="text-danger small"></span>
+    </div>
+
+    <div class="address-section mb-4">
+        <label class="form-label">Addresses</label>
+
+        <div id="addressContainer">
+            <div class="input-group mb-2 address-block" id="address1">
+                <input type="text" name="Address1" class="form-control" placeholder="Address 1" value="@Model.Address1" required />
+            </div>
+            <div class="input-group mb-2 address-block" id="address2" style="@(string.IsNullOrWhiteSpace(Model.Address2) ? "display:none" : "")">
+                <input type="text" name="Address2" class="form-control" placeholder="Address 2" value="@Model.Address2" />
+                <button type="button" class="btn btn-outline-danger" onclick="removeAddress(this, 2)">&#10005;</button>
+            </div>
+            <div class="input-group mb-2 address-block" id="address3" style="@(string.IsNullOrWhiteSpace(Model.Address3) ? "display:none" : "")">
+                <input type="text" name="Address3" class="form-control" placeholder="Address 3" value="@Model.Address3" />
+                <button type="button" class="btn btn-outline-danger" onclick="removeAddress(this, 3)">&#10005;</button>
+            </div>
+            <div class="input-group mb-2 address-block" id="address4" style="@(string.IsNullOrWhiteSpace(Model.Address4) ? "display:none" : "")">
+                <input type="text" name="Address4" class="form-control" placeholder="Address 4" value="@Model.Address4" />
+                <button type="button" class="btn btn-outline-danger" onclick="removeAddress(this, 4)">&#10005;</button>
+            </div>
+        </div>
+
+
+        <button type="button" id="addAddressBtn" class="btn btn-outline-secondary" onclick="addMoreAddress()">+ Add Address</button>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StateId" class="form-label">State</label>
+        <select asp-for="StateId" class="form-control" id="StateId" asp-items="ViewBag.States">
+            <option value="">-- Select State --</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CityId" class="form-label">City</label>
+        <select asp-for="CityId" class="form-control" id="CityId" asp-items="ViewBag.Cities">
+            <option value="">-- Select City --</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Pincode" class="form-label">Pincode</label>
+        <input asp-for="Pincode" class="form-control" />
+        <span asp-validation-for="Pincode" class="text-danger small"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    @{
+        var filledCount = 0;
+        if (!string.IsNullOrWhiteSpace(Model.Address1)) filledCount++;
+        if (!string.IsNullOrWhiteSpace(Model.Address2)) filledCount++;
+        if (!string.IsNullOrWhiteSpace(Model.Address3)) filledCount++;
+        if (!string.IsNullOrWhiteSpace(Model.Address4)) filledCount++;
+    }
+
+    <script>
+       
+        // Initial count based on pre-filled fields
+        let addressCount = @filledCount;
+
+        function addMoreAddress() {
+            if (addressCount >= 4) return;
+
+            addressCount++;
+            $("#address" + addressCount).show();
+
+            if (addressCount === 4) {
+                $('#addAddressBtn').prop('disabled', true);
+            }
+        }
+
+         function removeAddress(button, index) {
+            const inputGroup = $("#address" + index);
+            inputGroup.find("input").val("");        // Clear value
+            inputGroup.hide();                       // Just hide, don’t remove
+
+            addressCount--;
+
+            if (addressCount < 4) {
+                $('#addAddressBtn').prop('disabled', false);
+            }
+        }
+
+    
+
+        // Load cities on state change
+        $('#StateId').change(function () {
+            var stateId = $(this).val();
+            $('#CityId').empty().append('<option value="">-- Select City --</option>');
+
+            if (stateId) {
+                $.getJSON('/Account/GetCities?stateId=' + stateId, function (data) {
+                    $.each(data, function (i, city) {
+                        $('#CityId').append($('<option>', {
+                            value: city.id,
+                            text: city.cityName
+                        }));
+                    });
+                });
+            }
+        });
+    </script>
+}
+
+<style>
+    .address-section {
+        margin-top: 25px;
+    }
+
+    .address-block input {
+        flex: 1;
+    }
+
+    .address-block .btn {
+        margin-left: 5px;
+    }
+</style>

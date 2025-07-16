@@ -1,0 +1,62 @@
+﻿@model List<HMCSnacks.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Your Cart";
+}
+
+<h2 class="mb-3">Your Cart</h2>
+
+<!-- 🔔 Show temp message -->
+@if (TempData["CartMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["CartMessage"]</div>
+}
+
+<!-- 🔙 Back to products -->
+<a class="btn btn-secondary mb-3" asp-controller="Product" asp-action="Index">← Back to Products</a>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Your cart is empty.</div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>₹@item.Price</td>
+                    <td>@item.Quantity</td>
+                    <td>₹@(item.Quantity * item.Price)</td>
+                    <td>
+                        <form asp-action="RemoveFromCart" method="post" style="display:inline;">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between mt-3">
+        <!-- Clear Cart -->
+        <form asp-action="ClearCart" method="post">
+            <button type="submit" class="btn btn-warning">Clear Cart</button>
+        </form>
+
+        <!-- Proceed to Checkout -->
+        <a class="btn btn-success" asp-controller="Checkout" asp-action="Index">Proceed to Checkout</a>
+    </div>
+}

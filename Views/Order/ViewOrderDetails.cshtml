@@ -1,0 +1,129 @@
+﻿@model HMCSnacks.Models.Order
+@inject IHttpContextAccessor HttpContextAccessor
+
+<h2 class="mb-4">Order Details - ID: @Model.Id</h2>
+
+<table class="table table-bordered">
+    <tr><th>Customer Name:</th><td>@Model.Name</td></tr>
+    <tr><th>Email:</th><td>@Model.Email</td></tr>
+    <tr><th>Order Date:</th><td>@Model.OrderDate.ToString("dd MMM yyyy hh:mm tt")</td></tr>
+    <tr><th>Status:</th><td>@Model.OrderStatus</td></tr>
+</table>
+
+<hr />
+<h4>Products Ordered</h4>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Sr No</th>
+            <th>Product Image</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price (₹)</th>
+            <th>Weight/Size</th>
+            <th>Total (₹)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            decimal grandTotal = 0;
+        }
+
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            var item = Model.Items[i];
+            var product = item.Product;
+            var total = item.Price * item.Quantity;
+            grandTotal += total;
+            <tr>
+                <td>@(i + 1)</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(product?.ImagePath))
+                    {
+                        <img src="@product.ImagePath" width="70" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Image</span>
+                    }
+                </td>
+                <td>@product?.ProductName</td>
+                <td>@item.Quantity</td>
+                <td>₹@item.Price</td>
+                <td>@product?.WeightOrSize</td>
+                <td><strong>₹ @total</strong></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h5 class="text-end"><strong>Total Bill:</strong> ₹@grandTotal</h5>
+@if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "User")
+{
+    <a href="@Url.Action("OrderReports")" class="btn btn-secondary">Back</a>
+}
+else if (HttpContextAccessor.HttpContext?.Session.GetString("UserRole") == "Admin")
+{
+    var lowerStatus = Model.OrderStatus?.ToLower();
+
+    if (lowerStatus == "pending")
+    {
+        <form id="statusForm" asp-action="UpdateOrderStatus" method="post">
+            <input type="hidden" name="orderId" value="@Model.Id" />
+            <input type="hidden" id="statusInput" name="status" />
+
+            <div class="mb-3">
+                <label class="form-label">Admin Comment</label>
+                <textarea name="adminComment" class="form-control" rows="3">@Model.AdminComment</textarea>
+            </div>
+
+            <button type="button" class="btn btn-success me-2" onclick="openConfirmModal('Approved')">Approve</button>
+            <button type="button" class="btn btn-danger me-2" onclick="openConfirmModal('Rejected')">Reject</button>
+            <a href="@Url.Action("OrderReports")" class="btn btn-secondary">Back</a>
+        </form>
+    }
+    else
+    {
+        <a href="@Url.Action("OrderReports")" class="btn btn-secondary">Back</a>
+    }
+}
+
+
+
+<!-- ✅ Bootstrap Modal for Confirmation -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to <strong id="actionText">approve</strong> this order?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Yes, Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedStatus = "";
+
+        function openConfirmModal(status) {
+            selectedStatus = status;
+            document.getElementById("actionText").innerText = status.toLowerCase();
+            var modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            modal.show();
+        }
+
+        function submitForm() {
+            document.getElementById("statusInput").value = selectedStatus;
+            document.getElementById("statusForm").submit();
+        }
+    </script>
+}

@@ -1,0 +1,111 @@
+﻿@model HMCSnacks.Models.Product
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Add Product" : "Edit Product";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4">@ViewData["Title"]</h2>
+
+            <form asp-action="AddProduct" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <!-- Product Name -->
+                <div class="form-group mb-3">
+                    <label asp-for="ProductName" class="form-label"></label>
+                    <input asp-for="ProductName" class="form-control" />
+                    <span asp-validation-for="ProductName" class="text-danger"></span>
+                </div>
+
+                <!-- Category (static dropdown) -->
+                <div class="form-group mb-3">
+                    <label class="form-label">Category</label>
+                    <select asp-for="Category" class="form-control">
+                        <option value="">-- Select Category --</option>
+                        <option>Chips</option>
+                        <option>Namkeen</option>
+                        <option>Sweets</option>
+                        <option>Biscuits</option>
+                        <option>Beverages</option>
+                    </select>
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+
+                <!-- Price -->
+                <div class="form-group mb-3">
+                    <label asp-for="Price" class="form-label"></label>
+                    <input asp-for="Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <!-- Stock Quantity -->
+                <div class="form-group mb-3">
+                    <label class="form-label">Stock Quantity</label>
+                    <input asp-for="StockQuantity" type="number" class="form-control" />
+                    <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                </div>
+
+                <!-- Weight/Size -->
+                <div class="form-group mb-3">
+                    <label class="form-label">Weight / Size</label>
+                    <input asp-for="WeightOrSize" class="form-control" placeholder="e.g., 200g, 1kg, 500ml" />
+                    <span asp-validation-for="WeightOrSize" class="text-danger"></span>
+                </div>
+
+                <!-- Pack Type -->
+                <div class="form-group mb-3">
+                    <label class="form-label">Pack Type</label>
+                    <select asp-for="PackType" class="form-control">
+                        <option value="">-- Select Pack Type --</option>
+                        <option>Pouch</option>
+                        <option>Box</option>
+                        <option>Jar</option>
+                        <option>Can</option>
+                    </select>
+                    <span asp-validation-for="PackType" class="text-danger"></span>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- Product Image -->
+                <div class="form-group mb-3">
+                    <label class="form-label">Product Image</label>
+                    <input type="file" asp-for="ProductImage" class="form-control" />
+
+                    @if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <div class="mt-2">
+                            <img src="@Model.ImagePath" width="120" class="img-thumbnail" />
+                            <small class="text-muted d-block mt-1">Leave this empty to keep existing image.</small>
+                        </div>
+                    }
+
+                    <!-- This keeps the path in form submission -->
+                    <input type="hidden" asp-for="ImagePath" />
+                </div>
+
+                <!-- Best Seller / Highlight -->
+                <div class="form-check mb-4">
+                    <input asp-for="IsBestSeller" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsBestSeller" class="form-check-label">Best Seller / Highlight</label>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary w-100">
+                    @(Model.Id == 0 ? "Add Product" : "Update Product")
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
