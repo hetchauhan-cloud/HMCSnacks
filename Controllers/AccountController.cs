@@ -27,15 +27,25 @@ namespace HMCSnacks.Controllers
         /// GET: /Account/Register
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
-            ViewBag.States = _context.States
-                .Where(s => s.IsActive)
-                .Select(s => new { s.Id, s.StateName })
-                .ToList();
+            try
+            {
+                ViewBag.States = await _context.States
+                    .Where(s => s.IsActive)
+                    .Select(s => new { s.Id, s.StateName })
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log error (optional): Console.WriteLine("State load error: " + ex.Message);
+                ViewBag.States = new List<object>(); // Fallback to empty list
+                TempData["RegisterError"] = "Unable to load states at this time. Please try again later.";
+            }
 
             return View();
         }
+
 
         // POST: /Account/Register
         [HttpPost]
