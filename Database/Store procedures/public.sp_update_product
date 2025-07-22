@@ -1,0 +1,34 @@
+-- PROCEDURE: public.sp_update_product(integer, text, numeric, text, text, integer, text, text, text, boolean)
+
+-- DROP PROCEDURE IF EXISTS public.sp_update_product(integer, text, numeric, text, text, integer, text, text, text, boolean);
+
+CREATE OR REPLACE PROCEDURE public.sp_update_product(
+	IN p_id integer,
+	IN p_name text,
+	IN p_price numeric,
+	IN p_desc text,
+	IN p_category text,
+	IN p_stock integer,
+	IN p_weight_size text,
+	IN p_pack_type text,
+	IN p_image text,
+	IN p_best_seller boolean)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+    UPDATE "Products"
+    SET 
+        "ProductName" = p_name,
+        "Price" = p_price,
+        "Description" = p_desc,
+        "Category" = p_category,
+        "StockQuantity" = p_stock,
+        "WeightOrSize" = p_weight_size,
+        "PackType" = p_pack_type,
+        "ImagePath" = p_image,
+        "IsBestSeller" = p_best_seller
+    WHERE "Id" = p_id;
+END;
+$BODY$;
+ALTER PROCEDURE public.sp_update_product(integer, text, numeric, text, text, integer, text, text, text, boolean)
+    OWNER TO postgres;

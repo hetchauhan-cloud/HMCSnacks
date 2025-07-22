@@ -1,0 +1,28 @@
+-- FUNCTION: public.get_all_products(integer, integer)
+
+-- DROP FUNCTION IF EXISTS public.get_all_products(integer, integer);
+
+CREATE OR REPLACE FUNCTION public.get_all_products(
+	p_offset integer,
+	p_limit integer)
+    RETURNS TABLE(id integer, productname character varying, price numeric, description text, stockquantity integer, isactive boolean, isbestseller boolean) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY EXECUTE format(
+        'SELECT "Id", "ProductName", "Price", "Description", "StockQuantity", "IsActive", "IsBestSeller"
+         FROM "Products"
+         WHERE "IsActive" = TRUE
+         ORDER BY "Id"
+         OFFSET %s LIMIT %s',
+         p_offset, p_limit
+    );
+END;
+$BODY$;
+
+ALTER FUNCTION public.get_all_products(integer, integer)
+    OWNER TO postgres;

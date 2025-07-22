@@ -1,0 +1,22 @@
+-- Table: public.cities
+
+-- DROP TABLE IF EXISTS public.cities;
+
+CREATE TABLE IF NOT EXISTS public.cities
+(
+    city_id integer NOT NULL DEFAULT nextval('cities_city_id_seq'::regclass),
+    city_name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    state_id integer NOT NULL,
+    is_active boolean NOT NULL DEFAULT true,
+    created_date timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT cities_pkey PRIMARY KEY (city_id),
+    CONSTRAINT cities_state_id_fkey FOREIGN KEY (state_id)
+        REFERENCES public.states (state_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.cities
+    OWNER to postgres;
