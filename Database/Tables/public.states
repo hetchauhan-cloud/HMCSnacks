@@ -1,0 +1,18 @@
+-- Table: public.states
+
+-- DROP TABLE IF EXISTS public.states;
+
+CREATE TABLE IF NOT EXISTS public.states
+(
+    state_id integer NOT NULL DEFAULT nextval('states_state_id_seq'::regclass),
+    state_name character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    is_active boolean NOT NULL DEFAULT true,
+    created_date timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT states_pkey PRIMARY KEY (state_id),
+    CONSTRAINT states_state_name_key UNIQUE (state_name)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.states
+    OWNER to postgres;

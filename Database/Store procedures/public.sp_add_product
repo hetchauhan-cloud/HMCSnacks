@@ -1,0 +1,45 @@
+-- PROCEDURE: public.sp_add_product(text, numeric, text, text, integer, text, text, text, boolean)
+
+-- DROP PROCEDURE IF EXISTS public.sp_add_product(text, numeric, text, text, integer, text, text, text, boolean);
+
+CREATE OR REPLACE PROCEDURE public.sp_add_product(
+	IN p_product_name text,
+	IN p_price numeric,
+	IN p_description text,
+	IN p_category text,
+	IN p_stock_quantity integer,
+	IN p_weight_or_size text,
+	IN p_pack_type text,
+	IN p_image_path text,
+	IN p_is_best_seller boolean)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+    INSERT INTO "Products" (
+        "ProductName",
+        "Price",
+        "Description",
+        "Category",
+        "StockQuantity",
+        "WeightOrSize",
+        "PackType",
+        "ImagePath",
+        "IsBestSeller",
+        "IsActive"
+    )
+    VALUES (
+        p_product_name,
+        p_price,
+        p_description,
+        p_category,
+        p_stock_quantity,
+        p_weight_or_size,
+        p_pack_type,
+        p_image_path,
+        p_is_best_seller,
+        TRUE
+    );
+END;
+$BODY$;
+ALTER PROCEDURE public.sp_add_product(text, numeric, text, text, integer, text, text, text, boolean)
+    OWNER TO postgres;

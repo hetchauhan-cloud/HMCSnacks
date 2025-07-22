@@ -1,0 +1,23 @@
+-- Table: public.UserOTPs
+
+-- DROP TABLE IF EXISTS public."UserOTPs";
+
+CREATE TABLE IF NOT EXISTS public."UserOTPs"
+(
+    "Id" integer NOT NULL DEFAULT nextval('"UserOTPs_Id_seq"'::regclass),
+    "UserId" integer NOT NULL,
+    "OTP" character varying(6) COLLATE pg_catalog."default" NOT NULL,
+    "ExpiryTime" timestamp without time zone NOT NULL,
+    "IsUsed" boolean DEFAULT false,
+    "CreatedAt" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "UserOTPs_pkey" PRIMARY KEY ("Id"),
+    CONSTRAINT "UserOTPs_UserId_fkey" FOREIGN KEY ("UserId")
+        REFERENCES public."Users" ("Id") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public."UserOTPs"
+    OWNER to postgres;

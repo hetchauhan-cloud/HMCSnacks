@@ -31,6 +31,9 @@ namespace HMCSnacks.Controllers
         {
             try
             {
+                var states = await _context.States.ToListAsync();
+                Console.WriteLine("States Count: " + states.Count);
+
                 ViewBag.States = await _context.States
                     .Where(s => s.IsActive)
                     .Select(s => new { s.Id, s.StateName })

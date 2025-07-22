@@ -1,0 +1,23 @@
+-- Table: public.OrderItems
+
+-- DROP TABLE IF EXISTS public."OrderItems";
+
+CREATE TABLE IF NOT EXISTS public."OrderItems"
+(
+    "Id" integer NOT NULL DEFAULT nextval('"OrderItems_Id_seq"'::regclass),
+    "OrderId" integer,
+    "ProductId" integer,
+    "ProductName" character varying(100) COLLATE pg_catalog."default",
+    "Price" numeric(10,2),
+    "Quantity" integer,
+    CONSTRAINT "OrderItems_pkey" PRIMARY KEY ("Id"),
+    CONSTRAINT "OrderItems_OrderId_fkey" FOREIGN KEY ("OrderId")
+        REFERENCES public."Orders" ("Id") MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public."OrderItems"
+    OWNER to postgres;
