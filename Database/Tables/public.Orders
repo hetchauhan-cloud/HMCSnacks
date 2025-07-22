@@ -1,0 +1,24 @@
+-- Table: public.Orders
+
+-- DROP TABLE IF EXISTS public."Orders";
+
+CREATE TABLE IF NOT EXISTS public."Orders"
+(
+    "Id" integer NOT NULL DEFAULT nextval('"Orders_Id_seq"'::regclass),
+    "Username" character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    "Email" character varying(100) COLLATE pg_catalog."default",
+    "OrderDate" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    "Name" character varying(255) COLLATE pg_catalog."default",
+    "OrderStatus" character varying(50) COLLATE pg_catalog."default" DEFAULT 'Pending'::character varying,
+    "AdminComment" text COLLATE pg_catalog."default",
+    "DeliveryAddress" character varying(250) COLLATE pg_catalog."default",
+    "IsCancelledByAdmin" boolean DEFAULT false,
+    "IsCancelledByCustomer" boolean DEFAULT false,
+    "IsOrderDeleted" boolean DEFAULT false,
+    CONSTRAINT "Orders_pkey" PRIMARY KEY ("Id")
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public."Orders"
+    OWNER to postgres;

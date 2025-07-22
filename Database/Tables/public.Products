@@ -1,0 +1,24 @@
+-- Table: public.Products
+
+-- DROP TABLE IF EXISTS public."Products";
+
+CREATE TABLE IF NOT EXISTS public."Products"
+(
+    "Id" integer NOT NULL DEFAULT nextval('"Products_Id_seq"'::regclass),
+    "ProductName" character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    "Price" numeric(10,2) NOT NULL,
+    "Description" text COLLATE pg_catalog."default",
+    "IsActive" boolean DEFAULT true,
+    "Category" text COLLATE pg_catalog."default",
+    "StockQuantity" integer,
+    "WeightOrSize" text COLLATE pg_catalog."default",
+    "PackType" text COLLATE pg_catalog."default",
+    "ImagePath" text COLLATE pg_catalog."default",
+    "IsBestSeller" boolean DEFAULT false,
+    CONSTRAINT "Products_pkey" PRIMARY KEY ("Id")
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public."Products"
+    OWNER to postgres;
